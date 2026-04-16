@@ -1,0 +1,2994 @@
+<!doctype html>
+<html lang="es" class="h-full">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jean Food</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+    }
+
+    /* Patrón de fondo sutil */
+    .topographic-background::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #0f0f0f;
+      background-image: url(https://res.cloudinary.com/dngpdbq6u/image/upload/v1775768204/image-removebg-preview_al0lb4.png);
+      background-repeat: repeat;
+      background-attachment: fixed;
+      opacity: 0.08;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: #0f0f0f;
+      background-attachment: fixed;
+      color: #1a1a1a;
+      overflow: hidden;
+    }
+
+    #app {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      width: 100%;
+      overflow: auto;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .animate-slide-up {
+      animation: slideInUp 0.6s ease-out;
+    }
+
+    .stagger-1 {
+      animation-delay: 0.1s;
+    }
+
+    .stagger-2 {
+      animation-delay: 0.2s;
+    }
+
+    .stagger-3 {
+      animation-delay: 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #E63946 0%, #d41f3d 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(230, 57, 70, 0.5);
+    }
+
+    .btn-secondary {
+      background: #f7f7f7;
+      color: #1a1a1a;
+      border: 2px solid #e5e5e5;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-secondary:hover {
+      background: #efefef;
+      transform: translateY(-2px);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 600px;
+      max-height: 90%;
+      overflow-y: auto;
+      animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px;
+      border-bottom: 1px solid #f0f0f0;
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 10;
+    }
+
+    .modal-header h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      padding: 24px;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      gap: 12px;
+      position: sticky;
+      bottom: 0;
+      background: white;
+    }
+
+    .modal-footer button {
+      flex: 1;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+      border: 2px solid transparent;
+      animation: slideInUp 0.5s ease-out;
+    }
+
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 35px rgba(230, 57, 70, 0.2);
+      border-color: #E63946;
+    }
+
+    .product-image {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      overflow: hidden;
+      object-fit: cover;
+    }
+
+    .product-info {
+      padding: 16px;
+    }
+
+    .product-name {
+      font-weight: 700;
+      font-size: 15px;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .product-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: #E63946;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .form-label.required::after {
+      content: ' *';
+      color: #E63946;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e5e5;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.3s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #E63946;
+      box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
+    }
+
+    .cart-item {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      animation: slideInUp 0.3s ease;
+    }
+
+    .cart-item-image {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+      border-radius: 8px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      object-fit: cover;
+    }
+
+    .cart-item-details {
+      flex: 1;
+    }
+
+    .cart-item-name {
+      font-weight: 700;
+      font-size: 14px;
+      color: #1a1a1a;
+    }
+
+    .cart-item-options {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .cart-item-price {
+      font-size: 16px;
+      font-weight: 700;
+      color: #E63946;
+      margin-top: 8px;
+    }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .qty-btn {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #e5e5e5;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+
+    .qty-btn:hover {
+      background: #E63946;
+      color: white;
+      border-color: #E63946;
+    }
+
+    .categories-accordion {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .accordion-item {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      animation: slideInUp 0.5s ease-out;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .accordion-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      cursor: pointer;
+      background: white;
+      border: none;
+      width: 100%;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a1a1a;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+
+    .accordion-header:hover {
+      background: #f9f9f9;
+    }
+
+    .accordion-header.active {
+      background: #f0f0f0;
+    }
+
+    .accordion-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+      color: #E63946;
+    }
+
+    .accordion-header.active .accordion-icon {
+      transform: rotate(90deg);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background: #fafafa;
+    }
+
+    .accordion-content.active {
+      max-height: 2000px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      padding: 20px;
+      animation: slideInUp 0.5s ease-out;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 20px;
+      background: #1a1a1a;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      animation: slideInUp 0.3s ease;
+      z-index: 2000;
+    }
+
+    .toast.success {
+      background: #10b981;
+    }
+
+    .toast.error {
+      background: #E63946;
+    }
+
+    .cart-button {
+      width: 64px;
+      height: 64px;
+      background: white;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 2px solid transparent;
+    }
+
+    .cart-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 35px rgba(230, 57, 70, 0.3);
+      border-color: #E63946;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      background: #E63946;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 8px;
+    }
+
+    .checkbox-group:hover {
+      background: #f0f0f0;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #E63946;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #E63946;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #E63946;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d41f3d;
+    }
+
+    .topographic-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .topographic-background svg {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    /* Patrón de fondo sutil */
+    .topographic-background::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #0f0f0f;
+      background-image: url(https://res.cloudinary.com/dngpdbq6u/image/upload/v1775768204/image-removebg-preview_al0lb4.png);
+      background-repeat: repeat;
+      background-attachment: fixed;
+      opacity: 0.08;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    @media (max-width: 640px) {
+      .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      }
+
+      .modal-content {
+        width: 95vw;
+        max-height: 95%;
+      }
+    }
+  </style>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+  </style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+</head>
+
+<body><!-- Fondo topográfico decorativo -->
+  <div class="topographic-background">
+    <!-- SVG con patrón de líneas topográficas orgánicas -->
+    <svg viewbox="0 0 1200 800" preserveaspectratio="xMidYMid slice"
+      xmlns="https://res.cloudinary.com/dngpdbq6u/image/upload/v1775768204/image-removebg-preview_al0lb4.png">
+      <defs>
+        <!-- Definición de gradiente sutil para las líneas -->
+        <lineargradient id="topoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.08" />
+          <stop offset="50%" style="stop-color:#ffffff;stop-opacity:0.04" />
+          <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.02" />
+        </lineargradient>
+      </defs> <!-- Capas de curvas orgánicas tipo topografía --> <!-- Capa 1: Líneas suaves y amplias -->
+      <path d="M -100 100 Q 150 80 400 120 T 800 110 T 1300 140" stroke="url(#topoGradient)" stroke-width="1.5"
+        fill="none" opacity="0.6" />
+      <path d="M -50 200 Q 200 180 450 210 T 850 200 T 1250 240" stroke="url(#topoGradient)" stroke-width="1"
+        fill="none" opacity="0.5" />
+      <path d="M 0 300 Q 250 280 500 320 T 900 310 T 1300 350" stroke="url(#topoGradient)" stroke-width="1.2"
+        fill="none" opacity="0.55" />
+      <path d="M -80 400 Q 180 380 420 420 T 820 410 T 1280 450" stroke="url(#topoGradient)" stroke-width="1.1"
+        fill="none" opacity="0.5" /> <!-- Capa 2: Líneas medianas más irregulares -->
+      <path d="M 0 50 Q 180 100 350 70 T 750 110 T 1200 80" stroke="url(#topoGradient)" stroke-width="0.8" fill="none"
+        opacity="0.4" />
+      <path d="M -100 150 Q 150 160 380 140 T 800 170 T 1300 150" stroke="url(#topoGradient)" stroke-width="0.9"
+        fill="none" opacity="0.45" />
+      <path d="M 50 250 Q 280 240 520 280 T 950 260 T 1350 300" stroke="url(#topoGradient)" stroke-width="0.85"
+        fill="none" opacity="0.42" />
+      <path d="M -70 350 Q 160 360 410 340 T 880 380 T 1300 360" stroke="url(#topoGradient)" stroke-width="0.9"
+        fill="none" opacity="0.48" /> <!-- Capa 3: Líneas finas para detalle -->
+      <path d="M -100 500 Q 120 520 380 500 T 850 530 T 1300 510" stroke="url(#topoGradient)" stroke-width="0.6"
+        fill="none" opacity="0.35" />
+      <path d="M 20 600 Q 220 620 480 610 T 950 640 T 1350 620" stroke="url(#topoGradient)" stroke-width="0.7"
+        fill="none" opacity="0.4" />
+      <path d="M -80 700 Q 140 710 390 700 T 820 730 T 1280 710" stroke="url(#topoGradient)" stroke-width="0.65"
+        fill="none" opacity="0.38" /> <!-- Capa 4: Ondas verticales suaves -->
+      <path d="M 100 -50 Q 120 100 110 250 T 130 550 T 120 850" stroke="url(#topoGradient)" stroke-width="1" fill="none"
+        opacity="0.35" />
+      <path d="M 300 -50 Q 310 120 300 300 T 320 600 T 310 900" stroke="url(#topoGradient)" stroke-width="0.85"
+        fill="none" opacity="0.38" />
+      <path d="M 600 -50 Q 620 150 610 350 T 630 650 T 620 900" stroke="url(#topoGradient)" stroke-width="0.9"
+        fill="none" opacity="0.36" />
+      <path d="M 900 -50 Q 920 100 910 280 T 930 580 T 920 850" stroke="url(#topoGradient)" stroke-width="0.8"
+        fill="none" opacity="0.37" />
+      <path d="M 1100 -50 Q 1120 140 1110 340 T 1130 640 T 1120 900" stroke="url(#topoGradient)" stroke-width="0.75"
+        fill="none" opacity="0.39" /> <!-- Capa 5: Curvas diagonales complejas -->
+      <path d="M -100 400 Q 200 350 500 420 T 1000 380 T 1400 450" stroke="url(#topoGradient)" stroke-width="0.75"
+        fill="none" opacity="0.32" />
+      <path d="M 0 200 Q 250 150 550 250 T 1050 200 T 1500 280" stroke="url(#topoGradient)" stroke-width="0.8"
+        fill="none" opacity="0.34" />
+      <path d="M -100 650 Q 180 620 420 680 T 900 650 T 1350 700" stroke="url(#topoGradient)" stroke-width="0.7"
+        fill="none" opacity="0.33" /> <!-- Capa 6: Líneas muy finas para textura -->
+      <path d="M 50 80 Q 200 90 450 75 T 950 100 T 1350 85" stroke="url(#topoGradient)" stroke-width="0.5" fill="none"
+        opacity="0.25" />
+      <path d="M -50 450 Q 150 460 420 440 T 880 470 T 1300 450" stroke="url(#topoGradient)" stroke-width="0.5"
+        fill="none" opacity="0.28" />
+      <path d="M 30 760 Q 260 770 530 750 T 1000 780 T 1400 765" stroke="url(#topoGradient)" stroke-width="0.55"
+        fill="none" opacity="0.26" />
+    </svg>
+  </div>
+  <div id="app"><!-- ========================================
+        PANTALLA DE INICIO - SELECCIÓN DE UBICACIÓN
+        ======================================== -->
+    <div id="home-view" class="h-full flex flex-col items-center justify-center px-6 py-12 animate-fade-in">
+      <!-- Logo de la aplicación --> <img
+        src="https://res.cloudinary.com/dngpdbq6u/image/upload/v1775756289/JEAN_xewopn.png" alt="Jean Food"
+        style="width: 280px; height: auto; margin-bottom: 48px;" class="animate-slide-up stagger-1">
+      <!-- Texto explicativo -->
+      <p style="color: #888; font-size: 16px; letter-spacing: 0.05em; margin-bottom: 48px; text-transform: uppercase;"
+        class="animate-slide-up stagger-2">¿Dónde quieres pedir?</p><!-- Botones de ubicación -->
+      <div style="display: flex; gap: 16px; width: 100%; max-width: 500px; flex-direction: column; align-items: center;"
+        class="animate-slide-up stagger-3"><!-- Botón San Fernando - Activo con icono de ubicación --> <button
+          onclick="showLocation('san-fernando')" class="btn-primary"
+          style="width: 100%; padding: 16px 32px; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 12px;">
+          <i data-lucide="map-pin" style="width: 20px; height: 20px;"></i> San Fernando </button>
+        <!-- Botón Rancagua - Deshabilitado (próximamente) --> <button onclick="showLocation('rancagua')"
+          class="btn-secondary"
+          style="width: 100%; padding: 16px 32px; font-size: 16px; opacity: 0.5; cursor: not-allowed;" disabled> <i
+            data-lucide="map-pin" style="width: 20px; height: 20px;"></i> Rancagua (Próximamente) </button>
+      </div>
+    </div><!-- ========================================
+        PANTALLA PRINCIPAL - CATÁLOGO DE PRODUCTOS
+        ======================================== -->
+    <div id="sf-view" style="display: none; height: 100%; flex-direction: column; padding: 24px; overflow-y: auto;"
+      class="animate-fade-in"><!-- Encabezado con logo e instrucciones -->
+      <div style="text-align: center; margin-bottom: 32px; display: flex; flex-direction: column; align-items: center;">
+        <img src="https://res.cloudinary.com/dngpdbq6u/image/upload/v1775756289/JEAN_xewopn.png" alt="Jean Food"
+          style="height: 150px; margin-bottom: 20px;">
+        <p style="color: #999; font-size: 14px;">Selecciona una categoría y elige tus productos favoritos</p>
+      </div><!-- Contenedor de categorías (acordeón) -->
+      <div id="categories-container" style="max-width: 1200px; margin: 0 auto; width: 100%; padding: 0 12px;"
+        class="categories-accordion"><!-- Las categorías se cargan dinámicamente con JavaScript -->
+      </div><!-- Botón de carrito flotante -->
+      <div id="cart-header" style="position: fixed; bottom: 30px; right: 30px; display: none;"><button
+          onclick="toggleCart()" class="cart-button"> <i data-lucide="shopping-basket"
+            style="width: 28px; height: 28px; color: #E63946;"></i> <span class="cart-count" id="cart-count">0</span>
+        </button>
+      </div>
+    </div>
+  </div><!-- ========================================
+       MODAL - DETALLES DEL PRODUCTO
+       ======================================== -->
+  <div id="product-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-product-name">Producto</h2><button onclick="closeProductModal()"
+          style="background: none; border: none; cursor: pointer; font-size: 24px; color: #999;"> <i data-lucide="x"
+            style="width: 24px; height: 24px;"></i> </button>
+      </div>
+      <div class="modal-body">
+        <div id="modal-content"><!-- Contenido del producto cargado dinámicamente -->
+        </div>
+      </div>
+      <div class="modal-footer"><button onclick="closeProductModal()" class="btn-secondary">Cancelar</button> <button
+          onclick="addToCart()" class="btn-primary">Agregar al Carrito</button>
+      </div>
+    </div>
+  </div><!-- ========================================
+       MODAL - CARRITO DE COMPRAS
+       ======================================== -->
+  <div id="cart-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Tu Carrito</h2><button onclick="toggleCart()"
+          style="background: none; border: none; cursor: pointer; font-size: 24px; color: #999;"> <i data-lucide="x"
+            style="width: 24px; height: 24px;"></i> </button>
+      </div>
+      <div class="modal-body">
+        <div id="cart-items-list"><!-- Ítems del carrito cargados dinámicamente -->
+        </div>
+        <div id="empty-cart-message" style="text-align: center; padding: 40px 0;"><i data-lucide="shopping-bag"
+            style="width: 48px; height: 48px; color: #ccc; margin: 0 auto 16px; display: block;"></i>
+          <p style="color: #999;">Tu carrito está vacío</p>
+        </div>
+      </div>
+      <div id="cart-summary" style="padding: 24px; border-top: 1px solid #f0f0f0; display: none;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #666;">
+          <span>Subtotal:</span> <span id="subtotal">$0.00</span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; color: #1a1a1a; border-top: 1px solid #f0f0f0; padding-top: 12px;">
+          <span>Total:</span> <span id="total" style="color: #E63946;">$0.00</span>
+        </div>
+      </div>
+      <div class="modal-footer"><button onclick="toggleCart()" class="btn-secondary">Seguir Comprando</button> <button
+          onclick="checkout()" class="btn-primary">Finalizar Compra</button>
+      </div>
+    </div>
+  </div><!-- ========================================
+       MODAL - OPCIONES DE ENTREGA
+       ======================================== -->
+  <div id="delivery-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>¿Cómo deseas recibir tu pedido?</h2>
+      </div>
+      <div class="modal-body"><button onclick="selectDelivery('domicilio')" class="btn-primary"
+          style="width: 100%; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 12px;">
+          <i data-lucide="truck" style="width: 20px; height: 20px;"></i> Envío a Domicilio </button> <button
+          onclick="selectDelivery('retiro')" class="btn-secondary"
+          style="width: 100%; padding: 16px; display: flex; align-items: center; justify-content: center; gap: 12px;">
+          <i data-lucide="store" style="width: 20px; height: 20px;"></i> Retiro en Tienda </button>
+      </div>
+    </div>
+  </div><!-- ========================================
+       MODAL - FORMULARIO DE ENTREGA
+       ======================================== -->
+  <div id="delivery-form-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Información de Entrega</h2>
+      </div>
+      <div class="modal-body">
+        <form id="delivery-form" onsubmit="submitDeliveryForm(event)">
+          <div class="form-group"><label class="form-label required">Nombre</label> <input id="customer-name"
+              type="text" class="form-control" required>
+          </div>
+          <div class="form-group"><label class="form-label required">Email</label> <input id="customer-email"
+              type="email" class="form-control" required>
+          </div>
+          <div class="form-group"><label class="form-label required">Dirección</label> <input id="customer-address"
+              type="text" class="form-control" required>
+          </div>
+          <div class="form-group"><label class="form-label required">Teléfono</label> <input id="customer-phone"
+              type="tel" class="form-control" required>
+          </div>
+          <div class="form-group"><label class="form-label">Información Adicional</label> <textarea id="customer-notes"
+              class="form-control" style="resize: vertical; min-height: 100px;"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer"><button onclick="closeDeliveryForm()" class="btn-secondary">Cancelar</button> <button
+          onclick="document.getElementById('delivery-form').dispatchEvent(new Event('submit'))"
+          class="btn-primary">Continuar</button>
+      </div>
+    </div>
+  </div><!-- ========================================
+       MODAL - MÉTODO DE PAGO
+       ======================================== -->
+  <div id="payment-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Método de Pago</h2>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 12px;"><button
+          onclick="selectPayment('webpay')" class="btn-primary"
+          style="padding: 16px; text-align: left; display: flex; align-items: center; gap: 12px;"> <i
+            data-lucide="credit-card" style="width: 24px; height: 24px;"></i> <span>
+            WEBPAY</span> </button>
+        <button onclick="selectPayment('mercadopago')" class="btn-secondary"
+          style="padding: 16px; text-align: left; display: flex; align-items: center; gap: 12px;"> <i
+            data-lucide="wallet" style="width: 24px; height: 24px;"></i> <span>Mercado Pago</span> </button> <button
+          onclick="selectPayment('efectivo')" class="btn-secondary"
+          style="padding: 16px; text-align: left; display: flex; align-items: center; gap: 12px;"> <i
+            data-lucide="dollar-sign" style="width: 24px; height: 24px;"></i> <span>Efectivo</span> </button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // ========================================
+    // ESTRUCTURA DE DATOS GLOBAL
+    // ========================================
+
+    // ========================================
+    // ESTADO GLOBAL DE LA APLICACIÓN
+    // ========================================
+    const state = {
+      // Ubicación seleccionada por el usuario ('san-fernando' o 'rancagua')
+      currentLocation: null,
+
+      // Array que almacena todos los items del carrito
+      cart: [],
+
+      // Producto actualmente abierto en el modal de detalles
+      currentProduct: null,
+
+      // Tipo de entrega seleccionado ('domicilio' o 'retiro')
+      deliveryType: null,
+
+      // Datos de contacto del cliente para el pedido
+      customerName: '',
+      customerAddress: '',
+      customerPhone: '',
+      customerNotes: '',
+      selectedPaymentMethod: '',
+
+      // ========================================
+      // BASE DE PRODUCTOS - EDITABLE
+      // ========================================
+      // 📸 CÓMO AGREGAR TUS FOTOS REALES:
+      // 
+      // OPCIÓN 1 - Subir a un servidor web:
+      // ✅ Sube tus imágenes a un hosting (ej: Imgur, Cloudinary, Siteground)
+      // ✅ Copia la URL completa de la imagen
+      // ✅ Pega en el campo 'image': 'https://ejemplo.com/roll-clasico.jpg'
+      //
+      // OPCIÓN 2 - Usar URLs de imágenes públicas:
+      // ✅ Descarga de bancos de imágenes: Unsplash, Pexels, Pixabay
+      // ✅ Copia la URL directa y pégala
+      //
+      // OPCIÓN 3 - Sin fotos por ahora:
+      // ✅ Deja 'image: ""' y el emoji será el placeholder
+      //
+      // FORMATO CORRECTO:
+      // image: 'https://tuservidor.com/imagen-producto.jpg'
+      //
+      // IMPORTANTE:
+      // ⚠️  Las URLs DEBEN ser públicas (sin contraseña)
+      // ⚠️  Deben comenzar con https:// (no http://)
+      // ⚠️  Deben ser enlaces directos a la imagen (no a carpetas)
+      //
+      // EJEMPLO COMPLETO:
+      // {
+      //   id: 1,
+      //   name: 'Roll Clásico',
+      //   price: 7500,
+      //   image: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400',
+      //   emoji: '🍣',
+      //   category: 'ARMA TU ROLL',
+      //   hasOptions: true
+      // }
+
+      products: {
+        // ========== CATEGORÍA: ARMA TU ROLL ==========
+        'ARMA TU ROLL': [
+          {
+            id: 1,
+            name: 'CIBOULETE',
+            price: 3990,
+            description: 'Roll envuelto en ciboulette',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757148/CIBOULETTE_xyvvaa.jpg',
+            emoji: '🍣',
+            category: 'ARMA TU ROLL',
+            hasOptions: true
+          },
+          {
+            id: 2,
+            name: 'MASAGO',
+            price: 3990,
+            description: 'Roll envuelto en masago',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757195/MASAGO_lhayoq.jpg',
+            emoji: '🍣',
+            category: 'ARMA TU ROLL',
+            hasOptions: true
+          },
+          {
+            id: 3,
+            name: 'MERKEN',
+            price: 3990,
+            description: 'Roll envuelto en merkén',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757256/MERKEN_zuozli.jpg',
+            emoji: '🌱',
+            category: 'ARMA TU ROLL',
+            hasOptions: true
+          },
+
+          {
+            id: 4,
+            name: 'NORI',
+            price: 3990,
+            description: 'Roll envuelto en nori,',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757256/NORI_rbon6h.jpg',
+            emoji: '🌱',
+            category: 'ARMA TU ROLL',
+            hasOptions: true
+          },
+
+          {
+            id: 5,
+            name: 'PALTA',
+            price: 3990,
+            description: 'Roll envuelto en palta',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757256/PALTA_p5tsh0.jpg',
+            emoji: '🌱',
+            category: 'ARMA TU ROLL',
+            hasOptions: true
+          },
+
+          {
+            id: 6,
+            name: 'PANKO',
+            price: 3990,
+            description: 'Roll envuelto en panko crujiente',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757256/PANKO_nm9idr.jpg',
+            emoji: '🌱',
+            category: 'ARMA TU ROLL',
+            hasOptions: true
+          },
+
+          {
+            id: 8,
+            name: 'POLLO PIMENTÓN',
+            price: 4500,
+            description: 'Roll envuelto en pollo con toque de pimentón',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757615/POLLO_PIMENTON_krs6ws.jpg',
+            emoji: '🌱',
+            category: 'ARMA TU ROLL',
+            hasOptions: true
+          },
+
+          {
+            id: 9,
+            name: 'POLLO TOCINO',
+            price: 6990,
+            description: 'Roll envuelto en pollo con tocino crujiente',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757615/POLLO_TOCINO_igunc7.jpg',
+            emoji: '🌱',
+            category: 'ARMA TU ROLL',
+            hasOptions: true
+          },
+
+          {
+            id: 82,
+            name: 'SALMON FLAMEADO',
+            price: 6990,
+            description: 'Roll envuelto en salmón flameado con sabor ahumado',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757616/SALMON_FLAMEADO_kaqceu.jpg',
+            emoji: '🌱',
+            category: 'ARMA TU ROLL',
+            hasOptions: true
+          },
+
+          {
+            id: 83,
+            name: 'SESAMO',
+            price: 3990,
+            description: 'roll envuelto en semillas de sésamo tostado para un toque crujiente y sabroso',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757616/SESAMO_ocshhr.jpg',
+            emoji: '🌱',
+            category: 'ARMA TU ROLL',
+            hasOptions: true
+          },
+
+          {
+            id: 84,
+            name: 'QUESO',
+            price: 3990,
+            description: 'Queso crema suave y cremoso',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757615/QUESO_zmrqv5.jpg',
+            emoji: '🌱',
+            category: 'ARMA TU ROLL',
+            hasOptions: true
+          },
+        ],
+
+        // ========== CATEGORÍA: PROMOS ==========
+        'PROMOS': [
+          {
+            id: 10,
+            name: '1 GOHAN + 1 Bebida',
+            price: 8900,
+            description: 'Promo individual con comida y bebida',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757936/1_GOHAN_1_BEBIDA_hcbos2.jpg',
+            emoji: '🍚',
+            category: 'PROMOS',
+            hasOptions: true
+          },
+          {
+            id: 11,
+            name: '2 GOHAN + 2 Bebidas',
+            price: 16900,
+            description: 'Promo para dos con dos bebidas incluidas',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757936/2_GOHAN_2_BEBIDAS_k4mbtu.jpg',
+            emoji: '🍚',
+            category: 'PROMOS',
+            hasOptions: true
+          },
+          {
+            id: 12,
+            name: 'FAMILIAR',
+            price: 45000,
+            description: 'Promo para la familia completa',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757937/FAMILIAR_uoqtsl.jpg',
+            emoji: '👨‍👩‍👧‍👦',
+            category: 'PROMOS',
+            hasOptions: true
+          },
+
+          {
+            id: 85,
+            name: 'PREMIUM',
+            price: 45000,
+            description: 'Promo con los mejores ingredientes',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757937/PREMIUM_fqfgdy.jpg',
+            emoji: '👨‍👩‍👧‍👦',
+            category: 'PROMOS',
+            hasOptions: true
+          },
+
+          {
+            id: 86,
+            name: 'VIP',
+            price: 45000,
+            description: 'Experiencia gastronómica premium exclusiva',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775757937/VIP_s9e87t.jpg',
+            emoji: '👨‍👩‍👧‍👦',
+            category: 'PROMOS',
+            hasOptions: true
+          },
+        ],
+
+        // ========== CATEGORÍA: ESPECIALES ==========
+        'ESPECIALES': [
+          {
+            id: 20,
+            name: 'ACEVICHADO ROLL',
+            price: 10500,
+            description: 'Roll especial con ingredientes cevichados',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775762529/ACEVICHADO_ROLL_fnvjda.jpg',
+            emoji: '⭐',
+            category: 'ESPECIALES',
+            hasOptions: true
+          },
+          {
+            id: 21,
+            name: 'AJILLO ROLL',
+            price: 11500,
+            description: 'Roll con sabor ajo intenso y delicioso',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775762530/AJILLO_ROLL_gewihe.jpg',
+            emoji: '⭐',
+            category: 'ESPECIALES',
+            hasOptions: true
+          },
+
+          {
+            id: 87,
+            name: 'BBQ ROLL',
+            price: 11500,
+            description: 'Roll con salsa BBQ ahumada',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775762530/BBQ_ROLL_lccewe.jpg',
+            emoji: '⭐',
+            category: 'ESPECIALES',
+            hasOptions: true
+          },
+
+          {
+            id: 88,
+            name: 'DINAMITA ROLL',
+            price: 11500,
+            description: 'Roll explosivo con mucho sabor picante',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775762530/DINAMITA_ROLL_bcqfjt.jpg',
+            emoji: '⭐',
+            category: 'ESPECIALES',
+            hasOptions: true
+          },
+
+          {
+            id: 89,
+            name: 'FUJI ROLL',
+            price: 11500,
+            // 📸 EDITAR AQUÍ
+            image: '',
+            emoji: '⭐',
+            category: 'ESPECIALES',
+            hasOptions: true
+          },
+
+          {
+            id: 90,
+            name: 'DORI ROLL',
+            price: 11500,
+            description: 'Roll con doré suave y delicado',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775762530/DORI_ROLL_bofpss.jpg',
+            emoji: '⭐',
+            category: 'ESPECIALES',
+            hasOptions: true
+          },
+
+          {
+            id: 91,
+            name: 'NO RICE ROLL',
+            price: 11500,
+            description: 'Roll sin arroz para dietas bajas en carbohidratos',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775762531/NO_RICE_hajgzg.jpg',
+            emoji: '⭐',
+            category: 'ESPECIALES',
+            hasOptions: true
+          },
+
+          {
+            id: 92,
+            name: 'NEPTUNO ROLL',
+            price: 11500,
+            description: 'Roll marinero con variedad de frutos de mar',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775762530/NEPTUNO_ROLL_ckxpbu.jpg',
+            emoji: '⭐',
+            category: 'ESPECIALES',
+            hasOptions: true
+          },
+
+          {
+            id: 93,
+            name: 'PLATANO ROLL',
+            price: 11500,
+            description: 'Roll dulce con plátano y endulzantes',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775762532/PLATANO_ROLL_h5wgap.jpg',
+            emoji: '⭐',
+            category: 'ESPECIALES',
+            hasOptions: true
+          },
+
+          {
+            id: 94,
+            name: 'REINA ROLL',
+            price: 11500,
+            description: 'Roll regal con ingredientes premium seleccionados',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775762532/REINA_ROLL_ri6fdi.jpg',
+            emoji: '⭐',
+            category: 'ESPECIALES',
+            hasOptions: true
+          },
+
+          {
+            id: 95,
+            name: 'TUNA ROLL',
+            price: 11500,
+            description: 'Roll con atún fresco y sabroso',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775762532/TUNA_ROLL_me8lbu.jpg',
+            emoji: '⭐',
+            category: 'ESPECIALES',
+            hasOptions: true
+          },
+        ],
+
+        // ========== CATEGORÍA: GOHAN Y CEVICHE ==========
+        'GOHAN Y CEVICHE': [
+          {
+            id: 30,
+            name: 'CEVICHE MIXTO',
+            price: 7500,
+            description: 'Mezcla refrescante de frutos de mar marinados',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764270/CEVICHE_MIXTO_ncnbq5.jpg',
+            emoji: '🍚',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 96,
+            name: 'GOHAN TROPICAL',
+            price: 9500,
+            description: 'Gohan con sabores tropicales y exóticos',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764251/GOHAN_TROPICAL_rkslcf.png',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 97,
+            name: 'GOHAN SALMON',
+            price: 9500,
+            description: 'Gohan con salmón fresco y jugoso',
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764250/GOHAN_SALMON_lbkrgj.jpg',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 98,
+            name: 'GOHAN SALMON',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764250/GOHAN_SALMON_lbkrgj.jpg',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 99,
+            name: 'GOHAN POLLO TERIYAKI',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764250/GOHAN_POLLO_TERIYAKI_kaazgy.jpg',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 100,
+            name: 'GOHAN PALMITO',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764249/GOHAN_PALMITO_ksuubo.jpg',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 101,
+            name: 'GOHAN POLLO CRISPY',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764249/GOHAN_POLLO_CRISPY_tgu5pk.jpg',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 102,
+            name: ' GOHAN HAWAIANO',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764248/GOHAN_HAWAIANO_g1hu0r.png',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 103,
+            name: 'GOHAN DE TUNA',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764248/GOHAN_DE_TUNA_ojxjfy.jpg',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 104,
+            name: 'GOHAN DE KANIKAMA',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764247/GOHAN_DE_KANIKAMA_lei9od.jpg',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 105,
+            name: 'GOHAN CHAMPIÑON',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764247/GOHAN_CHAMPI%C3%91ON_qacbmp.jpg',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 106,
+            name: 'GOHAN CAMARONES MARINADOS',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764246/GOHAN_CAMARONES_MARINADOS_gz6xc5.jpg',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 107,
+            name: 'GOHAN CAMARON FURAI',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764246/GOHAN_CAMARON_FURAI_ajslik.jpg',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 108,
+            name: 'GOHAN CAMARONES AL AJILLO',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764246/GOHAN_CAMARONES_AL_AJILLO_a71ulr.jpg',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+          {
+            id: 109,
+            name: ' GOHAN BERENJENA CRISPY',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775764246/GOHAN_BERENJENA_CRISPY_qvxmik.jpg',
+            emoji: '🐟',
+            category: 'GOHAN Y CEVICHE',
+            hasOptions: false
+          },
+
+        ],
+
+        // ========== CATEGORÍA: WOK ==========
+        'WOK': [
+          {
+            id: 40,
+            name: 'WOK DE CAMARON',
+            price: 8500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766220/WOK_CAMARON_zphwzu.jpg',
+            emoji: '🍜',
+            category: 'WOK',
+            hasOptions: false
+          },
+          {
+            id: 41,
+            name: 'WOK DE CHAMPIÑON',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766220/WOK_CAMARON_zphwzu.jpg',
+            emoji: '🍜',
+            category: 'WOK',
+            hasOptions: false
+          },
+          {
+            id: 110,
+            name: 'WOK KANIKAMA',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766220/WOK_CAMARON_zphwzu.jpg',
+            emoji: '🍜',
+            category: 'WOK',
+            hasOptions: false
+          },
+          {
+            id: 111,
+            name: 'WOK POLLO TERIYAKI',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766220/WOK_CAMARON_zphwzu.jpg',
+            emoji: '🍜',
+            category: 'WOK',
+            hasOptions: false
+          },
+          {
+            id: 112,
+            name: 'WOK SALMON',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766220/WOK_CAMARON_zphwzu.jpg',
+            emoji: '🍜',
+            category: 'WOK',
+            hasOptions: false
+          },
+          {
+            id: 113,
+            name: 'WOK TUNA',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766220/WOK_CAMARON_zphwzu.jpg',
+            emoji: '🍜',
+            category: 'WOK',
+            hasOptions: false
+          },
+
+          {
+            id: 114,
+            name: 'WOK VEGETARIANO',
+            price: 9500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766220/WOK_CAMARON_zphwzu.jpg',
+            emoji: '🍜',
+            category: 'WOK',
+            hasOptions: false
+          },
+        ],
+
+        // ========== CATEGORÍA: ACOMPAÑAMIENTOS ==========
+        'ACOMPAÑAMIENTOS': [
+          {
+            id: 50,
+            name: 'ARROLLADOS DE PRIMAVERA',
+            price: 3500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766506/ARROLLADOS_PRIMAVERA_iabrtf.jpg',
+            emoji: '🍟',
+            category: 'ACOMPAÑAMIENTOS',
+            hasOptions: false
+          },
+          {
+            id: 51,
+            name: 'EMPANADAS DE CAMARON QUESO',
+            price: 5500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766507/EMPANADAS_DE_CAMARON_QUESO_pcifc6.jpg',
+            emoji: '🍗',
+            category: 'ACOMPAÑAMIENTOS',
+            hasOptions: false
+          },
+          {
+            id: 115,
+            name: 'EMPANADAS DE CARNE MONGOLIANA',
+            price: 5500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🍗',
+            category: 'ACOMPAÑAMIENTOS',
+            hasOptions: false
+          },
+          {
+            id: 116,
+            name: 'GYOSAS DE POLLO',
+            price: 5500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🍗',
+            category: 'ACOMPAÑAMIENTOS',
+            hasOptions: false
+          },
+          {
+            id: 117,
+            name: 'PORCION DE CAMARONES FURAI',
+            price: 5500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🍗',
+            category: 'ACOMPAÑAMIENTOS',
+            hasOptions: false
+          },
+          {
+            id: 118,
+            name: 'PORCION POLLO CRISPY',
+            price: 5500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🍗',
+            category: 'ACOMPAÑAMIENTOS',
+            hasOptions: false
+          },
+          {
+            id: 119,
+            name: 'TORI BALLS',
+            price: 5500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🍗',
+            category: 'ACOMPAÑAMIENTOS',
+            hasOptions: false
+          },
+        ],
+
+        // ========== CATEGORÍA: BEBIDAS ==========
+        'BEBIDAS': [
+          {
+            id: 120,
+            name: 'AGUA VITAL CON GAS',
+            price: 2500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766743/AGUA_VITAL_CON_GAS_600_ML_ejm7r7.jpg',
+            emoji: '🥤',
+            category: 'BEBIDAS',
+            hasOptions: false
+          },
+          {
+            id: 61,
+            name: 'AGUA VITAL SIN GAS',
+            price: 3500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766744/AGUA_VITAL_SIN_GAS_600_ML_xmwe4v.jpg',
+            emoji: '🧃',
+            category: 'BEBIDAS',
+            hasOptions: false
+          },
+          {
+            id: 120,
+            name: 'COCA_COLA_LIGTH_350_ML',
+            price: 2500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766746/COCA_COLA_LIGTH_350_ML_nfeubg.jpg',
+            emoji: '🥤',
+            category: 'BEBIDAS',
+            hasOptions: false
+          },
+          {
+            id: 121,
+            name: 'COCA_COLA_SIN_AZUCAR_350_ML',
+            price: 3500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766826/COCA_COLA_SIN_AZUCAR_350_ML_qktkde.jpg',
+            emoji: '🧃',
+            category: 'BEBIDAS',
+            hasOptions: false
+          },
+          {
+            id: 122,
+            name: 'COCA_COLA_350_ML',
+            price: 2500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766827/COLA_COLA_350_ML_l5ujow.jpg',
+            emoji: '🥤',
+            category: 'BEBIDAS',
+            hasOptions: false
+          },
+          {
+            id: 123,
+            name: 'FANTA_350_ML',
+            price: 3500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766828/FANTA_350_ML_jldoan.jpg',
+            emoji: '🧃',
+            category: 'BEBIDAS',
+            hasOptions: false
+          },
+          {
+            id: 124,
+            name: 'FANTA_SIN_AZUCAR_350_ML',
+            price: 2500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766829/FANTA_SIN_AZUCAR_350_ML_msfyyb.jpg',
+            emoji: '🥤',
+            category: 'BEBIDAS',
+            hasOptions: false
+          },
+          {
+            id: 125,
+            name: 'SPRITE_350_ML',
+            price: 3500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766830/SPRITE_350_ML_youjfb.jpg',
+            emoji: '🧃',
+            category: 'BEBIDAS',
+            hasOptions: false
+          },
+          {
+            id: 126,
+            name: 'SPRITE_SIN_AZUCAR_350_ML',
+            price: 2500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766831/SPRITE_SIN_AZUCAR_350_ML_kxzuij.jpg',
+            emoji: '🥤',
+            category: 'BEBIDAS',
+            hasOptions: false
+          },
+          {
+            id: 127,
+            name: 'COCA COLA 1.5 ',
+            price: 3500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🧃',
+            category: 'BEBIDAS',
+            hasOptions: false
+          },
+        ],
+
+        // ========== CATEGORÍA: SALSAS ==========
+        'SALSAS': [
+          {
+            id: 70,
+            name: 'DRAGON',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🥢',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 71,
+            name: 'JENGIBRE',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🌶️',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 128,
+            name: 'SALSA ACEVICHADA',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🥢',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 129,
+            name: 'SALSA BBQ',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🌶️',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 130,
+            name: 'SALSA DE MANGO',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🥢',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 131,
+            name: 'SALSA DE MARACUYA',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🌶️',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 132,
+            name: 'SALSA DE PIMENTON',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🥢',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 133,
+            name: 'SALSA DE SOYA',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🌶️',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 134,
+            name: 'SALSA DE VINO',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🥢',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 135,
+            name: 'SALSA DULCE',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🌶️',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 136,
+            name: 'SALSA FUJI',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🥢',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 137,
+            name: 'SALSA TERIYAKI',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🌶️',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 138,
+            name: 'TERIYAKI MAYO',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🌶️',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+          {
+            id: 139,
+            name: 'WASABI',
+            price: 500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775766518/DRAGON_zrowl6.jpg',
+            emoji: '🌶️',
+            category: 'SALSAS',
+            hasOptions: false
+          },
+
+        ],
+
+        // ========== CATEGORÍA: POSTRES ==========
+        'POSTRES': [
+          {
+            id: 80,
+            name: 'FRANUI',
+            price: 3500,
+            // 📸 EDITAR AQUÍ
+            image: 'https://res.cloudinary.com/dngpdbq6u/image/upload/v1775767986/FRANUI_lldtcg.jpg',
+            emoji: '🍦',
+            category: 'POSTRES',
+            hasOptions: false
+          },
+        ],
+      }
+    };
+
+    // ========================================
+    // FUNCIONES PRINCIPALES
+    // ========================================
+
+    /**
+     * Muestra la pantalla del catálogo de la ubicación seleccionada
+     * @param {string} location - Ubicación: 'san-fernando' o 'rancagua'
+     */
+    function showLocation(location) {
+      state.currentLocation = location;
+      document.getElementById('home-view').style.display = 'none';
+      document.getElementById('sf-view').style.display = 'flex';
+      renderCategories();
+      setTimeout(() => lucide.createIcons(), 100);
+    }
+
+    /**
+     * Regresa a la pantalla de selección de ubicación
+     */
+    function goHome() {
+      state.currentLocation = null;
+      state.cart = [];
+      document.getElementById('sf-view').style.display = 'none';
+      document.getElementById('home-view').style.display = 'flex';
+      closeAllModals();
+    }
+
+    /**
+     * Renderiza todas las categorías en acordeón expandible
+     */
+    function renderCategories() {
+      const container = document.getElementById('categories-container');
+      container.innerHTML = '';
+
+      // Itera sobre cada categoría de productos
+      Object.keys(state.products).forEach((category, index) => {
+        // Crea el item del acordeón
+        const item = document.createElement('div');
+        item.className = 'accordion-item';
+
+        // Crea el encabezado del acordeón
+        const header = document.createElement('button');
+        header.className = 'accordion-header';
+        header.innerHTML = `
+          <span>${category}</span>
+          <div class="accordion-icon">
+            <i data-lucide="chevron-right"></i>
+          </div>
+        `;
+
+        // Crea el contenedor de contenido del acordeón
+        const content = document.createElement('div');
+        content.className = 'accordion-content';
+
+        // Crea la grilla de productos
+        const grid = document.createElement('div');
+        grid.className = 'products-grid';
+
+        // Agrega cada producto a la grilla
+        state.products[category].forEach(product => {
+          const card = createProductCard(product);
+          grid.appendChild(card);
+        });
+
+        content.appendChild(grid);
+        item.appendChild(header);
+        item.appendChild(content);
+        container.appendChild(item);
+
+        // Event listener para expandir/contraer acordeón
+        header.addEventListener('click', () => {
+          const isActive = header.classList.contains('active');
+
+          // Cierra todos los acordeones abiertos
+          document.querySelectorAll('.accordion-header').forEach(h => {
+            h.classList.remove('active');
+          });
+          document.querySelectorAll('.accordion-content').forEach(c => {
+            c.classList.remove('active');
+          });
+
+          // Abre el acordeón actual si no estaba abierto
+          if (!isActive) {
+            header.classList.add('active');
+            content.classList.add('active');
+          }
+        });
+      });
+
+      lucide.createIcons();
+    }
+
+    /**
+     * Crea una tarjeta de producto con imagen o emoji
+     * @param {object} product - Objeto del producto
+     * @returns {HTMLElement} Elemento de la tarjeta
+     */
+    function createProductCard(product) {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.onclick = () => openProductModal(product);
+
+      // Determina si mostrar imagen o emoji
+      const imageDisplay = product.image
+        ? `<img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">`
+        : `<span>${product.emoji}</span>`;
+
+      card.innerHTML = `
+        <div class="product-image">
+          ${imageDisplay}
+        </div>
+        <div class="product-info">
+          <div class="product-name">${product.name}</div>
+          ${product.description ? `<div style="font-size: 12px; color: #999; margin-bottom: 8px; line-height: 1.3;">${product.description}</div>` : ''}
+          <div class="product-price">$${product.price.toLocaleString('es-CL')}</div>
+          <button class="btn-primary" style="width: 100%; padding: 8px;">Agregar</button>
+        </div>
+      `;
+      return card;
+    }
+
+    const extraOptionsHtml = `
+          <div class="checkbox-group" style="background: transparent; padding: 0; border: none;">
+            <input type="checkbox" id="add-more" onchange="toggleAddMore()" style="accent-color: #E63946;">
+            <label for="add-more" style="margin: 0; cursor: pointer; font-weight: 600;">¿Deseas algo más?</label>
+          </div>
+          <div id="extra-options" style="display: none; margin-top: 16px;">
+            <div class="form-group">
+              <label class="form-label">Acompañamientos</label>
+              <select class="form-control">
+                <option value="">Selecciona un acompañamiento</option>
+                <option value="arrollados">Arrollados de Primavera - $3.500</option>
+                <option value="empanadas-camaron">Empanadas de Camarón Queso - $5.500</option>
+                <option value="empanadas-carne">Empanadas de Carne Mongoliana - $5.500</option>
+                <option value="gyosas">Gyosas de Pollo - $5.500</option>
+                <option value="camarones">Porción de Camarones Furai - $5.500</option>
+                <option value="pollo-crispy">Porción Pollo Crispy - $5.500</option>
+                <option value="tori-balls">Tori Balls - $5.500</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bebidas</label>
+              <select class="form-control">
+                <option value="">Selecciona una bebida</option>
+                <option value="agua-gas">Agua Vital Con Gas - $2.500</option>
+                <option value="agua-sin-gas">Agua Vital Sin Gas - $3.500</option>
+                <option value="coca-light">Coca Cola Light 350ml - $2.500</option>
+                <option value="coca-sin-azucar">Coca Cola Sin Azúcar 350ml - $3.500</option>
+                <option value="coca-normal">Coca Cola 350ml - $2.500</option>
+                <option value="fanta">Fanta 350ml - $3.500</option>
+                <option value="fanta-sin-azucar">Fanta Sin Azúcar 350ml - $2.500</option>
+                <option value="sprite">Sprite 350ml - $3.500</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Salsas</label>
+              <select class="form-control">
+                <option value="">Selecciona una salsa</option>
+                <option value="dragon">Dragon - $500</option>
+                <option value="jengibre">Jengibre - $500</option>
+                <option value="acevichada">Salsa Acevichada - $500</option>
+                <option value="bbq">Salsa BBQ - $500</option>
+                <option value="mango">Salsa de Mango - $500</option>
+                <option value="maracuya">Salsa de Maracuyá - $500</option>
+                <option value="pimenton">Salsa de Pimentón - $500</option>
+                <option value="soya">Salsa de Soya - $500</option>
+                <option value="vino">Salsa de Vino - $500</option>
+                <option value="dulce">Salsa Dulce - $500</option>
+                <option value="fuji">Salsa Fuji - $500</option>
+                <option value="teriyaki">Salsa Teriyaki - $500</option>
+                <option value="teriyaki-mayo">Teriyaki Mayo - $500</option>
+                <option value="wasabi">Wasabi - $500</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Postres</label>
+              <select class="form-control">
+                <option value="">Selecciona un postre</option>
+                <option value="franui">Franui - $3.500</option>
+              </select>
+            </div>
+          </div>
+        `;
+
+    function buildCategoryOptions(category, placeholder, filterFn = () => true) {
+      const products = (state.products[category] || []).filter(filterFn);
+      return `
+                <option value="">${placeholder}</option>
+                ${products.map(product => `<option value="${product.name}">${product.name}</option>`).join('')}
+              `;
+    }
+
+    /**
+     * Abre el modal de detalles del producto
+     * @param {object} product - Objeto del producto
+     */
+    function openProductModal(product) {
+      state.currentProduct = {
+        ...product,
+        selectedOptions: {},
+        quantity: 1,
+        extras: []
+      };
+
+      const content = document.getElementById('modal-content');
+      content.innerHTML = generateProductForm(product);
+      document.getElementById('product-modal').classList.add('active');
+      lucide.createIcons();
+    }
+
+    /**
+     * Genera el formulario dinámico según el tipo de producto
+     * @param {object} product - Objeto del producto
+     * @returns {string} HTML del formulario
+     */
+    function generateProductForm(product) {
+      // Obtiene imagen del producto o usa emoji
+      const imageDisplay = product.image
+        ? `<img src="${product.image}" alt="${product.name}" style="width: 50%; max-height: 400px; object-fit: cover; border-radius: 12px; margin-bottom: 16px;">`
+        : `<div style="font-size: 80px; text-align: center; margin-bottom: 16px;">${product.emoji}</div>`;
+
+      let form = `
+        <div style="margin-bottom: 24px;">
+          ${imageDisplay}
+          <h3 style="font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px;">${product.name}</h3>
+          ${product.description ? `<p style="color: #666; font-size: 14px; margin-bottom: 12px; line-height: 1.5;">${product.description}</p>` : ''}
+          <p style="color: #999; margin-bottom: 16px;">Selecciona tus opciones preferidas</p>
+          <p style="font-size: 18px; font-weight: 700; color: #E63946;">$${product.price.toLocaleString('es-CL')}</p>
+        </div>
+      `;
+
+      // Genera opciones específicas según la categoría del producto
+      if (product.category === 'ARMA TU ROLL') {
+        form += `
+          <div class="form-group">
+            <label class="form-label required">Proteína</label>
+            <select class="form-control" onchange="handleProteinChange(this.value)">
+              <option value="">Selecciona una proteína</option>
+              <option value="SIN PROTEINA|0">SIN PROTEINA</option>
+              <option value="POLLO|0">POLLO</option>
+              <option value="PALMITO|0">PALMITO</option>
+              <option value="TOFU|0">TOFU </option>
+              <option value="CHAMPIÑON|0">CHAMPIÑON</option>
+              <option value="CAMARON FURAI|2000">CAMARON FURAI (+$2000)</option>
+              <option value="CAMARON SIN APANAR|2000">CAMARON SIN APANAR (+$2000)</option>
+              <option value="SALMON|2000">SALMON (+$2000)</option>
+              <option value="SALMON FURAI|2000">SALMON FURAI (+$2000)</option>
+              <option value="TUNA|2000">TUNA (+$2000)</option>
+            </select>
+            <p style="font-weight: 700; color: #1a1a1a; margin-top: 8px;">Incluye 1 soya</p>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(event)">
+              <span>Cambios</span>
+              <span class="accordion-icon">›</span>
+            </button>
+            <div class="accordion-content">
+              <div style="padding: 16px 20px;">
+                <div class="checkbox-group">
+                  <input type="checkbox" id="no-nori" onchange="toggleOption('no-nori', 'Sin Nori', 1000)">
+                  <label for="no-nori" style="margin: 0; cursor: pointer; flex: 1;">Sin Nori <span style="color: #E63946; font-weight: 700;">(+$1000)</span></label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="no-queso" onchange="toggleOption('no-queso', 'Sin Queso Crema', 0)">
+                  <label for="no-queso" style="margin: 0; cursor: pointer; flex: 1;">Sin Queso Crema</label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="no-palta" onchange="toggleOption('no-palta', 'Sin Palta', 0)">
+                  <label for="no-palta" style="margin: 0; cursor: pointer; flex: 1;">Sin Palta</label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="con-platano" onchange="toggleOption('con-platano', 'Con Plátano Frito', 1000)">
+                  <label for="con-platano" style="margin: 0; cursor: pointer; flex: 1;">Con Plátano Frito <span style="color: #E63946; font-weight: 700;">(+$1000)</span></label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="con-pimenton" onchange="toggleOption('con-pimenton', 'Con Pimentón', 500)">
+                  <label for="con-pimenton" style="margin: 0; cursor: pointer; flex: 1;">Con Pimentón <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="con-pepino" onchange="toggleOption('con-pepino', 'Con Pepino', 500)">
+                  <label for="con-pepino" style="margin: 0; cursor: pointer; flex: 1;">Con Pepino <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="con-ciboulette" onchange="toggleOption('con-ciboulette', 'Con Ciboulette', 500)">
+                  <label for="con-ciboulette" style="margin: 0; cursor: pointer; flex: 1;">Con Ciboulette <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="con-cebollin" onchange="toggleOption('con-cebollin', 'Con Cebollín', 500)">
+                  <label for="con-cebollin" style="margin: 0; cursor: pointer; flex: 1;">Con Cebollín <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+          ${extraOptionsHtml}
+        `;
+      } else if (product.category === 'GOHAN Y CEVICHE') {
+        form += `
+          <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(event)">
+              <span>Extra de Proteína</span>
+              <span class="accordion-icon">›</span>
+            </button>
+            <div class="accordion-content">
+              <div style="padding: 16px 20px;">
+                <!-- Aquí puedes editar las opciones de proteína extras -->
+                <div class="form-group">
+                  <label class="form-label">Selecciona un extra de proteína</label>
+                  <select class="form-control" onchange="state.currentProduct.selectedOptions.proteinExtra = this.value">
+                    <option value="">Selecciona una opción</option>
+                    <!-- Ejemplo de opciones:
+                    <option value="CAMARON_FURAI|2000">Camarón Furai (+$2000)</option>
+                    <option value="SALMON|2000">Salmón (+$2000)</option>
+                    <option value="TUNA|2000">Tuna (+$2000)</option>
+                    -->
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(event)">
+              <span>Cambios</span>
+              <span class="accordion-icon">›</span>
+            </button>
+            <div class="accordion-content">
+              <div style="padding: 16px 20px;">
+                <div class="checkbox-group">
+                  <input type="checkbox" id="no-nori" onchange="toggleOption('no-nori', 'Sin nori', 0)">
+                  <label for="no-nori" style="margin: 0; cursor: pointer; flex: 1;">Sin nori</label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="no-queso" onchange="toggleOption('no-queso', 'Sin queso crema', 0)">
+                  <label for="no-queso" style="margin: 0; cursor: pointer; flex: 1;">Sin queso crema</label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="add-palta" onchange="toggleOption('add-palta', 'Agregar palta', 500)">
+                  <label for="add-palta" style="margin: 0; cursor: pointer; flex: 1;">Agregar palta <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="con-platano" onchange="toggleOption('con-platano', 'Con Plátano Frito', 1000)">
+                  <label for="con-platano" style="margin: 0; cursor: pointer; flex: 1;">Con Plátano Frito <span style="color: #E63946; font-weight: 700;">(+$1000)</span></label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="con-pimenton" onchange="toggleOption('con-pimenton', 'Con Pimentón', 500)">
+                  <label for="con-pimenton" style="margin: 0; cursor: pointer; flex: 1;">Con Pimentón <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="con-pepino" onchange="toggleOption('con-pepino', 'Con Pepino', 500)">
+                  <label for="con-pepino" style="margin: 0; cursor: pointer; flex: 1;">Con Pepino <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="con-ciboulette" onchange="toggleOption('con-ciboulette', 'Con Ciboulette', 500)">
+                  <label for="con-ciboulette" style="margin: 0; cursor: pointer; flex: 1;">Con Ciboulette <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                </div>
+                <div class="checkbox-group">
+                  <input type="checkbox" id="con-cebollin" onchange="toggleOption('con-cebollin', 'Con Cebollín', 500)">
+                  <label for="con-cebollin" style="margin: 0; cursor: pointer; flex: 1;">Con Cebollín <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                </div>
+                <div style="margin-top: 24px;">
+                  ${extraOptionsHtml}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (product.category === 'WOK') {
+        form += `
+          <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(event)">
+              <span>Extra de Proteína</span>
+              <span class="accordion-icon">›</span>
+            </button>
+            <div class="accordion-content">
+              <div style="padding: 16px 20px;">
+                <!-- Aquí puedes editar las opciones de proteína extras -->
+                <div class="form-group">
+                  <label class="form-label">Selecciona un extra de proteína</label>
+                  <select class="form-control" onchange="state.currentProduct.selectedOptions.proteinExtra = this.value">
+                    <option value="">Selecciona una opción</option>
+                    <!-- Ejemplo de opciones:
+                    <option value="CAMARON_FURAI|2000">Camarón Furai (+$2000)</option>
+                    <option value="SALMON|2000">Salmón (+$2000)</option>
+                    <option value="TUNA|2000">Tuna (+$2000)</option>
+                    -->
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 24px;">
+            ${extraOptionsHtml}
+          </div>
+        `;
+      } else if (product.category === 'POSTRES') {
+        form += `
+          <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(event)">
+              <span>Selecciona tu sabor</span>
+              <span class="accordion-icon">›</span>
+            </button>
+            <div class="accordion-content">
+              <div style="padding: 16px 20px;">
+                <div class="form-group">
+                  <label class="form-label required">Sabor</label>
+                  <select class="form-control" onchange="state.currentProduct.selectedOptions.postreFlavor = this.value">
+                    <option value="">Selecciona un sabor</option>
+                    <option value="Chocolate Amargo">Chocolate Amargo</option>
+                    <option value="Chocolate Dulce">Chocolate Dulce</option>
+                    <option value="Chocolate Pink">Chocolate Pink</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (product.category === 'ESPECIALES') {
+        form += `
+          <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(event)">
+              <span>Cambios</span>
+              <span class="accordion-icon">›</span>
+            </button>
+            <div class="accordion-content">
+              <div style="padding: 16px 20px;">
+                <div class="form-group">
+                  <label class="form-label required">Proteína</label>
+                  <select class="form-control" onchange="handleProteinChange(this.value)">
+                    <option value="">Selecciona una proteína</option>
+                    <option value="SIN PROTEINA|0">SIN PROTEINA</option>
+                    <option value="POLLO|0">POLLO</option>
+                    <option value="PALMITO|0">PALMITO</option>
+                    <option value="TOFU|0">TOFU</option>
+                    <option value="CHAMPIÑON|0">CHAMPIÑON</option>
+                    <option value="CAMARON FURAI|2000">CAMARON FURAI (+$2000)</option>
+                    <option value="CAMARON SIN APANAR|2000">CAMARON SIN APANAR (+$2000)</option>
+                    <option value="SALMON|2000">SALMON (+$2000)</option>
+                    <option value="SALMON FURAI|2000">SALMON FURAI (+$2000)</option>
+                    <option value="TUNA|2000">TUNA (+$2000)</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-top: 16px;">
+                  <label class="form-label">Toppings</label>
+                  <div class="checkbox-group">
+                    <input type="checkbox" id="add-palta" onchange="toggleOption('add-palta', 'Agregar palta', 500)">
+                    <label for="add-palta" style="margin: 0; cursor: pointer; flex: 1;">Agregar palta <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                  </div>
+                  <div class="checkbox-group">
+                    <input type="checkbox" id="add-platano" onchange="toggleOption('add-platano', 'Agregar plátano', 1000)">
+                    <label for="add-platano" style="margin: 0; cursor: pointer; flex: 1;">Agregar plátano <span style="color: #E63946; font-weight: 700;">(+$1000)</span></label>
+                  </div>
+                  <div class="checkbox-group">
+                    <input type="checkbox" id="add-pimenton" onchange="toggleOption('add-pimenton', 'Agregar pimentón', 500)">
+                    <label for="add-pimenton" style="margin: 0; cursor: pointer; flex: 1;">Agregar pimentón <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                  </div>
+                  <div class="checkbox-group">
+                    <input type="checkbox" id="add-pepino" onchange="toggleOption('add-pepino', 'Agregar pepino', 500)">
+                    <label for="add-pepino" style="margin: 0; cursor: pointer; flex: 1;">Agregar pepino <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                  </div>
+                </div>
+                <div class="form-group" style="margin-top: 16px;">
+                  <label class="form-label required">Envoltura</label>
+                  <select class="form-control" onchange="state.currentProduct.selectedOptions.wrap = this.value">
+                    <option value="">Selecciona una envoltura</option>
+                    <option value="NORI">NORI</option>
+                    <option value="ARROZ">ARROZ</option>
+                    <option value="LECHUGA">LECHUGA</option>
+                    <option value="SIN_NORI">SIN NORI</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 24px;">
+            ${extraOptionsHtml}
+          </div>
+        `;
+      } else if (product.category === 'PROMOS') {
+        // Opciones específicas para promo 1
+        if (product.id === 10) {
+          form += `
+            <div class="form-group">
+              <label class="form-label required">Gohan</label>
+              <select class="form-control" onchange="state.currentProduct.selectedOptions.gohan1 = this.value" required>
+              ${buildCategoryOptions('GOHAN Y CEVICHE', 'Selecciona un Gohan', p => p.name.toUpperCase().includes('GOHAN'))}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label required">Bebida</label>
+              <select class="form-control" onchange="state.currentProduct.selectedOptions.bebida1 = this.value" required>
+              ${buildCategoryOptions('BEBIDAS', 'Selecciona una Bebida')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Salsa</label>
+              <select class="form-control" onchange="state.currentProduct.selectedOptions.salsa = this.value">
+              ${buildCategoryOptions('SALSAS', 'Selecciona una salsa')}
+              </select>
+            </div>
+            <div class="accordion-item">
+              <button class="accordion-header" onclick="toggleAccordion(event)">
+                <span>Cambios</span>
+                <span class="accordion-icon">›</span>
+              </button>
+              <div class="accordion-content">
+                <div style="padding: 16px 20px;">
+                  <div class="checkbox-group">
+                    <input type="checkbox" id="no-nori" onchange="toggleOption('no-nori', 'Sin nori', 0)">
+                    <label for="no-nori" style="margin: 0; cursor: pointer; flex: 1;">Sin nori</label>
+                  </div>
+                  <div class="checkbox-group">
+                    <input type="checkbox" id="no-queso" onchange="toggleOption('no-queso', 'Sin queso crema', 0)">
+                    <label for="no-queso" style="margin: 0; cursor: pointer; flex: 1;">Sin queso crema</label>
+                  </div>
+                  <div class="checkbox-group">
+                    <input type="checkbox" id="add-palta" onchange="toggleOption('add-palta', 'Agregar palta', 500)">
+                    <label for="add-palta" style="margin: 0; cursor: pointer; flex: 1;">Agregar palta <span style="color: #E63946; font-weight: 700;">(+$500)</span></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ${extraOptionsHtml}
+        `;
+        } else if (product.id === 11) {
+          // Opciones específicas para promo 2
+          form += `
+            <div class="form-group">
+              <label class="form-label required">Gohan 1</label>
+              <select class="form-control" onchange="state.currentProduct.selectedOptions.gohan1 = this.value; showGohan2()" required>
+              ${buildCategoryOptions('GOHAN Y CEVICHE', 'Selecciona un Gohan', p => p.name.toUpperCase().includes('GOHAN'))}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label required">Bebida 1</label>
+              <select class="form-control" onchange="state.currentProduct.selectedOptions.bebida1 = this.value" required>
+              ${buildCategoryOptions('BEBIDAS', 'Selecciona una Bebida')}
+              </select>
+            </div>
+            <div id="gohan2-section" style="display: none;">
+              <div class="form-group">
+                <label class="form-label required">Gohan 2</label>
+                <select class="form-control" onchange="state.currentProduct.selectedOptions.gohan2 = this.value">
+                ${buildCategoryOptions('GOHAN Y CEVICHE', 'Selecciona un Gohan', p => p.name.toUpperCase().includes('GOHAN'))}
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label required">Bebida 2</label>
+                <select class="form-control" onchange="state.currentProduct.selectedOptions.bebida2 = this.value">
+                ${buildCategoryOptions('BEBIDAS', 'Selecciona una Bebida')}
+                </select>
+              </div>
+            </div>
+          ${extraOptionsHtml}
+        `;
+        } else if (product.id === 12) {
+          // Opciones específicas para promo familiar
+          form += `
+            <div id="familiar-selection">
+              <p style="color: #666; font-size: 14px; margin-bottom: 16px;">Selecciona tus 10 envolturas y 10 pankos</p>
+              <div id="envolturas-container"></div>
+              <div id="pankos-container" style="margin-top: 24px;"></div>
+            </div>
+            <div class="form-group" style="margin-top: 24px;">
+              <label class="form-label required">Bebida</label>
+              <select class="form-control" onchange="state.currentProduct.selectedOptions.bebidaFamiliar = this.value" required>
+              ${buildCategoryOptions('BEBIDAS', 'Selecciona una Bebida')}
+              </select>
+            </div>
+            ${extraOptionsHtml}
+            <div class="form-group">
+              <label class="form-label">Postre</label>
+              <select class="form-control">
+                <option value="">Selecciona un postre</option>
+                <option value="helado">Helado</option>
+                <option value="cheesecake">Cheesecake</option>
+              </select>
+            </div>
+          `;
+          setTimeout(() => initFamiliar(product.id), 100);
+        } else if (product.id === 85) {
+          // Opciones específicas para promo PREMIUM (2 selecciones)
+          form += `
+            <div id="premium-selection">
+              <p style="color: #666; font-size: 14px; margin-bottom: 16px;">Selecciona tus 2 envolturas y 2 pankos</p>
+              <div id="premium-envolturas-container"></div>
+              <div id="premium-pankos-container" style="margin-top: 24px;"></div>
+            </div>
+            <div class="form-group" style="margin-top: 24px;">
+              <label class="form-label required">Bebida</label>
+              <select class="form-control" onchange="state.currentProduct.selectedOptions.bebidaPremium = this.value" required>
+              ${buildCategoryOptions('BEBIDAS', 'Selecciona una Bebida')}
+              </select>
+            </div>
+            ${extraOptionsHtml}
+          `;
+          setTimeout(() => initPremium(product.id), 100);
+        } else if (product.id === 86) {
+          // Opciones específicas para promo VIP (3 selecciones)
+          form += `
+            <div id="vip-selection">
+              <p style="color: #666; font-size: 14px; margin-bottom: 16px;">Selecciona tus 3 envolturas y 3 pankos</p>
+              <div id="vip-envolturas-container"></div>
+              <div id="vip-pankos-container" style="margin-top: 24px;"></div>
+            </div>
+            <div class="form-group" style="margin-top: 24px;">
+              <label class="form-label required">Bebida</label>
+              <select class="form-control" onchange="state.currentProduct.selectedOptions.bebidaVip = this.value" required>
+              ${buildCategoryOptions('BEBIDAS', 'Selecciona una Bebida')}
+              </select>
+            </div>
+            ${extraOptionsHtml}
+          `;
+          setTimeout(() => initVip(product.id), 100);
+        }
+      }
+
+      // Agregación de cantidad al final del formulario
+      form += `
+        <div class="form-group" style="margin-top: 24px;">
+          <label class="form-label">Cantidad</label>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <button type="button" class="qty-btn" onclick="decreaseQty()">−</button>
+            <input type="number" id="qty-input" value="1" min="1" style="width: 60px; text-align: center; border: 2px solid #e5e5e5; padding: 8px; border-radius: 8px; font-weight: 700;">
+            <button type="button" class="qty-btn" onclick="increaseQty()">+</button>
+          </div>
+        </div>
+      `;
+
+      return form;
+    }
+
+    /**
+     * Maneja el cambio de proteína y suma costos adicionales
+     * @param {string} value - Valor de la proteína con costo (formato: "NOMBRE|COSTO")
+     */
+    function handleProteinChange(value) {
+      const [protein, costStr] = value.split('|');
+      const cost = parseInt(costStr) || 0;
+
+      // Restar costo anterior si existe
+      if (state.currentProduct.lastProteinCost) {
+        state.currentProduct.additionalCost = (state.currentProduct.additionalCost || 0) - state.currentProduct.lastProteinCost;
+      }
+
+      // Sumar nuevo costo
+      if (cost > 0) {
+        state.currentProduct.additionalCost = (state.currentProduct.additionalCost || 0) + cost;
+      }
+
+      // Guardar proteína y costo
+      state.currentProduct.selectedOptions.protein = protein;
+      state.currentProduct.lastProteinCost = cost;
+    }
+
+    /**
+     * Alterna opciones adicionales del producto
+     * @param {string} id - ID del elemento checkbox
+     * @param {string} label - Etiqueta de la opción
+     * @param {number} cost - Costo adicional de la opción
+     */
+    function toggleOption(id, label, cost = 0) {
+      const checkbox = document.getElementById(id);
+      const optionWithCost = cost > 0 ? `${label} (+$${cost})` : label;
+
+      if (checkbox.checked) {
+        if (!state.currentProduct.extras.includes(optionWithCost)) {
+          state.currentProduct.extras.push(optionWithCost);
+          if (cost > 0) {
+            state.currentProduct.additionalCost = (state.currentProduct.additionalCost || 0) + cost;
+          }
+        }
+      } else {
+        state.currentProduct.extras = state.currentProduct.extras.filter(e => e !== optionWithCost);
+        if (cost > 0) {
+          state.currentProduct.additionalCost = (state.currentProduct.additionalCost || 0) - cost;
+        }
+      }
+    }
+
+    /**
+     * Alterna un acordeón dentro del modal
+     * @param {Event} event - Evento del click
+     */
+    function toggleAccordion(event) {
+      const header = event.currentTarget;
+      const content = header.nextElementSibling;
+      const isActive = header.classList.contains('active');
+
+      if (isActive) {
+        header.classList.remove('active');
+        content.classList.remove('active');
+      } else {
+        header.classList.add('active');
+        content.classList.add('active');
+      }
+    }
+
+    /**
+     * Muestra/oculta opciones adicionales
+     */
+    function toggleAddMore() {
+      const checkbox = document.getElementById('add-more');
+      const extraOptions = document.getElementById('extra-options');
+      extraOptions.style.display = checkbox.checked ? 'block' : 'none';
+    }
+
+    /**
+     * Muestra el segundo gohan cuando se selecciona el primero
+     */
+    function showGohan2() {
+      const gohan1 = document.querySelector('select[onchange*="gohan1"]').value;
+      const gohan2Section = document.getElementById('gohan2-section');
+      if (gohan1) {
+        gohan2Section.style.display = 'block';
+      }
+    }
+
+    /**
+     * Inicializa las selecciones para la promo familiar
+     * @param {number} productId - ID del producto
+     */
+    function initFamiliar(productId) {
+      const envolturaOptions = ['Queso-Pollo', 'Queso-Palmito', 'Queso-Kanikama', 'Queso-Champiñon', 'Queso-Camaron Furai (+$2000)', 'Queso Salmon (+2000)', 'Queso-Tuna (+2000) ', 'Palta-Pollo', 'Palta-Palmito', 'Palta-Kanikama', 'Palta-Champiñon', 'Palta-Camaron Furai (+$2000)', 'Palta Salmon (+2000)', 'Palta-Tuna (+2000)', 'Ciboulette-Pollo', 'Ciboulette-Palmito', 'Ciboulette-Kanikama', 'Ciboulette-Champiñon', 'Ciboulette-Camaron Furai (+$2000)',];
+      const pankoOptions = ['Pollo', 'Palmito', 'Kanikama', 'Champiñon', 'Camaron Furai (+$2000)', 'Salmon (+2000)', 'Tuna (+2000)'];
+
+      let envForm = '<div class="form-group"><label class="form-label required">Envolturas (10)</label>';
+      for (let i = 1; i <= 10; i++) {
+        envForm += `
+          <select id="envoltura-select-${i}" class="form-control" onchange="showFamiliarSelect(${i}, 'envoltura')" style="margin-bottom: 12px; display: ${i === 1 ? 'block' : 'none'};">
+            <option value="">Envoltura ${i} - Selecciona</option>
+            ${envolturaOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+          </select>
+        `;
+      }
+      envForm += '</div>';
+
+      let pankoForm = '<div class="form-group"><label class="form-label required">Pankos (10)</label>';
+      for (let i = 1; i <= 10; i++) {
+        pankoForm += `
+          <select id="panko-select-${i}" class="form-control" onchange="showFamiliarSelect(${i}, 'panko')" style="margin-bottom: 12px; display: ${i === 1 ? 'block' : 'none'};">
+            <option value="">Panko ${i} - Selecciona</option>
+            ${pankoOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+          </select>
+        `;
+      }
+      pankoForm += '</div>';
+
+      document.getElementById('envolturas-container').innerHTML = envForm;
+      document.getElementById('pankos-container').innerHTML = pankoForm;
+    }
+
+    /**
+     * Muestra el siguiente select en la promo familiar
+     * @param {number} current - Número actual de selección
+     * @param {string} type - Tipo de opción: 'envoltura' o 'panko'
+     */
+    function showFamiliarSelect(current, type) {
+      const currentSelect = document.getElementById(`${type}-select-${current}`);
+      if (!currentSelect) return;
+      const value = currentSelect.value;
+      const nextSelect = document.getElementById(`${type}-select-${current + 1}`);
+
+      if (value && nextSelect) {
+        nextSelect.style.display = 'block';
+      }
+
+      if (!value) {
+        for (let i = current + 1; i <= 10; i++) {
+          const select = document.getElementById(`${type}-select-${i}`);
+          if (select) {
+            select.style.display = 'none';
+            select.value = '';
+          }
+        }
+      }
+    }
+
+    /**
+     * Aumenta la cantidad del producto en 1
+     */
+    function increaseQty() {
+      state.currentProduct.quantity++;
+      document.getElementById('qty-input').value = state.currentProduct.quantity;
+    }
+
+    /**
+     * Inicializa las selecciones para la promo PREMIUM (2 selecciones)
+     * @param {number} productId - ID del producto
+     */
+    function initPremium(productId) {
+      const envolturaOptions = ['Queso-Pollo', 'Queso-Palmito', 'Queso-Kanikama', 'Queso-Champiñon', 'Queso-Camaron Furai (+$2000)', 'Queso Salmon (+2000)', 'Queso-Tuna (+2000) ', 'Palta-Pollo', 'Palta-Palmito', 'Palta-Kanikama', 'Palta-Champiñon', 'Palta-Camaron Furai (+$2000)', 'Palta Salmon (+2000)', 'Palta-Tuna (+2000)', 'Ciboulette-Pollo', 'Ciboulette-Palmito', 'Ciboulette-Kanikama', 'Ciboulette-Champiñon', 'Ciboulette-Camaron Furai (+$2000)',];
+      const pankoOptions = ['Pollo', 'Palmito', 'Kanikama', 'Champiñon', 'Camaron Furai (+$2000)', 'Salmon (+2000)', 'Tuna (+2000)'];
+
+      let envForm = '<div class="form-group"><label class="form-label required">Envolturas (2)</label>';
+      for (let i = 1; i <= 2; i++) {
+        envForm += `
+          <select id="premium-envoltura-select-${i}" class="form-control" onchange="showPremiumSelect(${i}, 'envoltura')" style="margin-bottom: 12px; display: ${i === 1 ? 'block' : 'none'};">
+            <option value="">Envoltura ${i} - Selecciona</option>
+            ${envolturaOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+          </select>
+        `;
+      }
+      envForm += '</div>';
+
+      let pankoForm = '<div class="form-group"><label class="form-label required">Pankos (2)</label>';
+      for (let i = 1; i <= 2; i++) {
+        pankoForm += `
+          <select id="premium-panko-select-${i}" class="form-control" onchange="showPremiumSelect(${i}, 'panko')" style="margin-bottom: 12px; display: ${i === 1 ? 'block' : 'none'};">
+            <option value="">Panko ${i} - Selecciona</option>
+            ${pankoOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+          </select>
+        `;
+      }
+      pankoForm += '</div>';
+
+      document.getElementById('premium-envolturas-container').innerHTML = envForm;
+      document.getElementById('premium-pankos-container').innerHTML = pankoForm;
+    }
+
+    /**
+     * Muestra el siguiente select en la promo PREMIUM
+     * @param {number} current - Número actual de selección
+     * @param {string} type - Tipo de opción: 'envoltura' o 'panko'
+     */
+    function showPremiumSelect(current, type) {
+      const currentSelect = document.getElementById(`premium-${type}-select-${current}`);
+      if (!currentSelect) return;
+      const value = currentSelect.value;
+      const nextSelect = document.getElementById(`premium-${type}-select-${current + 1}`);
+
+      if (value && nextSelect) {
+        nextSelect.style.display = 'block';
+      }
+
+      if (!value) {
+        for (let i = current + 1; i <= 2; i++) {
+          const select = document.getElementById(`premium-${type}-select-${i}`);
+          if (select) {
+            select.style.display = 'none';
+            select.value = '';
+          }
+        }
+      }
+    }
+
+    /**
+     * Inicializa las selecciones para la promo VIP (3 selecciones)
+     * @param {number} productId - ID del producto
+     */
+    function initVip(productId) {
+      const envolturaOptions = ['Queso-Pollo', 'Queso-Palmito', 'Queso-Kanikama', 'Queso-Champiñon', 'Queso-Camaron Furai (+$2000)', 'Queso Salmon (+2000)', 'Queso-Tuna (+2000) ', 'Palta-Pollo', 'Palta-Palmito', 'Palta-Kanikama', 'Palta-Champiñon', 'Palta-Camaron Furai (+$2000)', 'Palta Salmon (+2000)', 'Palta-Tuna (+2000)', 'Ciboulette-Pollo', 'Ciboulette-Palmito', 'Ciboulette-Kanikama', 'Ciboulette-Champiñon', 'Ciboulette-Camaron Furai (+$2000)',];
+      const pankoOptions = ['Pollo', 'Palmito', 'Kanikama', 'Champiñon', 'Camaron Furai (+$2000)', 'Salmon (+2000)', 'Tuna (+2000)'];
+
+      let envForm = '<div class="form-group"><label class="form-label required">Envolturas (3)</label>';
+      for (let i = 1; i <= 3; i++) {
+        envForm += `
+          <select id="vip-envoltura-select-${i}" class="form-control" onchange="showVipSelect(${i}, 'envoltura')" style="margin-bottom: 12px; display: ${i === 1 ? 'block' : 'none'};">
+            <option value="">Envoltura ${i} - Selecciona</option>
+            ${envolturaOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+          </select>
+        `;
+      }
+      envForm += '</div>';
+
+      let pankoForm = '<div class="form-group"><label class="form-label required">Pankos (3)</label>';
+      for (let i = 1; i <= 3; i++) {
+        pankoForm += `
+          <select id="vip-panko-select-${i}" class="form-control" onchange="showVipSelect(${i}, 'panko')" style="margin-bottom: 12px; display: ${i === 1 ? 'block' : 'none'};">
+            <option value="">Panko ${i} - Selecciona</option>
+            ${pankoOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+          </select>
+        `;
+      }
+      pankoForm += '</div>';
+
+      document.getElementById('vip-envolturas-container').innerHTML = envForm;
+      document.getElementById('vip-pankos-container').innerHTML = pankoForm;
+    }
+
+    /**
+     * Muestra el siguiente select en la promo VIP
+     * @param {number} current - Número actual de selección
+     * @param {string} type - Tipo de opción: 'envoltura' o 'panko'
+     */
+    function showVipSelect(current, type) {
+      const currentSelect = document.getElementById(`vip-${type}-select-${current}`);
+      if (!currentSelect) return;
+      const value = currentSelect.value;
+      const nextSelect = document.getElementById(`vip-${type}-select-${current + 1}`);
+
+      if (value && nextSelect) {
+        nextSelect.style.display = 'block';
+      }
+
+      if (!value) {
+        for (let i = current + 1; i <= 3; i++) {
+          const select = document.getElementById(`vip-${type}-select-${i}`);
+          if (select) {
+            select.style.display = 'none';
+            select.value = '';
+          }
+        }
+      }
+    }
+
+    /**
+     * Disminuye la cantidad del producto en 1
+     */
+    function decreaseQty() {
+      if (state.currentProduct.quantity > 1) {
+        state.currentProduct.quantity--;
+        document.getElementById('qty-input').value = state.currentProduct.quantity;
+      }
+    }
+
+    /**
+     * Agrega el producto actual al carrito
+     */
+    function addToCart() {
+      // Validación: si es ARMA TU ROLL, debe seleccionar proteína
+      if (!state.currentProduct.selectedOptions.protein && state.currentProduct.category === 'ARMA TU ROLL') {
+        showToast('Por favor selecciona una proteína', 'error');
+        return;
+      }
+
+      // Validación: si es POSTRES, debe seleccionar sabor
+      if (!state.currentProduct.selectedOptions.postreFlavor && state.currentProduct.category === 'POSTRES') {
+        showToast('Por favor selecciona un sabor', 'error');
+        return;
+      }
+
+      // Crea un item del carrito con ID único basado en timestamp
+      const cartItem = {
+        id: Date.now(),
+        ...state.currentProduct
+      };
+
+      // Agrega al carrito y muestra confirmación
+      state.cart.push(cartItem);
+      showToast(`${state.currentProduct.name} agregado al carrito`, 'success');
+      closeProductModal();
+      updateCartUI();
+    }
+
+    /**
+     * Actualiza la interfaz del carrito con los items actuales
+     */
+    function updateCartUI() {
+      // Calcula cantidad total de items
+      const count = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('cart-count').textContent = count;
+      document.getElementById('cart-header').style.display = count > 0 ? 'block' : 'none';
+
+      const itemsList = document.getElementById('cart-items-list');
+      const emptyMsg = document.getElementById('empty-cart-message');
+      const summary = document.getElementById('cart-summary');
+
+      if (state.cart.length === 0) {
+        // Si el carrito está vacío, muestra mensaje
+        itemsList.innerHTML = '';
+        emptyMsg.style.display = 'block';
+        summary.style.display = 'none';
+      } else {
+        // Si hay items, muestra la lista
+        emptyMsg.style.display = 'none';
+        summary.style.display = 'block';
+        itemsList.innerHTML = state.cart.map(item => {
+          // Determina si mostrar imagen o emoji
+          const imageDisplay = item.image
+            ? `<img src="${item.image}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`
+            : `<span>${item.emoji}</span>`;
+
+          return `
+            <div class="cart-item">
+              <div class="cart-item-image">
+                ${imageDisplay}
+              </div>
+              <div class="cart-item-details">
+                <div class="cart-item-name">${item.name}</div>
+                <div class="cart-item-options">
+                  ${item.extras.length > 0 ? `<p>${item.extras.join(', ')}</p>` : ''}
+                </div>
+                <div class="cart-item-price">$${((item.price + (item.additionalCost || 0)) * item.quantity).toLocaleString('es-CL')}</div>
+                <div class="qty-controls">
+                  <button class="qty-btn" onclick="removeFromCart(${item.id})">
+                    <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                  </button>
+                  <span style="font-size: 14px; color: #666;">Cantidad: ${item.quantity}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Calcula y muestra el total
+        const total = state.cart.reduce((sum, item) => sum + ((item.price + (item.additionalCost || 0)) * item.quantity), 0);
+        document.getElementById('subtotal').textContent = `$${total.toLocaleString('es-CL')}`;
+        document.getElementById('total').textContent = `$${total.toLocaleString('es-CL')}`;
+      }
+
+      lucide.createIcons();
+    }
+
+    /**
+     * Elimina un item del carrito
+     * @param {number} id - ID único del item
+     */
+    function removeFromCart(id) {
+      state.cart = state.cart.filter(item => item.id !== id);
+      updateCartUI();
+    }
+
+    /**
+     * Alterna la visibilidad del modal del carrito
+     */
+    function toggleCart() {
+      document.getElementById('cart-modal').classList.toggle('active');
+    }
+
+    /**
+     * Cierra el modal del producto
+     */
+    function closeProductModal() {
+      document.getElementById('product-modal').classList.remove('active');
+    }
+
+    /**
+     * Inicia el flujo de checkout
+     */
+    function checkout() {
+      if (state.cart.length === 0) {
+        showToast('Tu carrito está vacío', 'error');
+        return;
+      }
+      toggleCart();
+      document.getElementById('delivery-modal').classList.add('active');
+    }
+
+    /**
+     * Selecciona tipo de entrega
+     * @param {string} type - 'domicilio' o 'retiro'
+     */
+    function selectDelivery(type) {
+      state.deliveryType = type;
+      document.getElementById('delivery-modal').classList.remove('active');
+
+      if (type === 'domicilio') {
+        document.getElementById('delivery-form-modal').classList.add('active');
+      } else {
+        document.getElementById('payment-modal').classList.add('active');
+      }
+    }
+
+    /**
+     * Cierra el formulario de entrega
+     */
+    function closeDeliveryForm() {
+      document.getElementById('delivery-form-modal').classList.remove('active');
+      document.getElementById('payment-modal').classList.add('active');
+    }
+
+    /**
+     * Envía el formulario de entrega
+     * @param {event} event - Evento del formulario
+     */
+    function submitDeliveryForm(event) {
+      event.preventDefault();
+      state.customerName = document.getElementById('customer-name').value.trim();
+      state.customerEmail = document.getElementById('customer-email').value.trim();
+      state.customerAddress = document.getElementById('customer-address').value.trim();
+      state.customerPhone = document.getElementById('customer-phone').value.trim();
+      state.customerNotes = document.getElementById('customer-notes').value.trim();
+      closeDeliveryForm();
+    }
+
+    async function sendOrderToBackend(order) {
+      try {
+        const response = await fetch('http://localhost:3000/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(order)
+        });
+        return await response.json();
+      } catch (error) {
+        console.error('Error enviando pedido al backend:', error);
+        return { success: false, message: 'No se pudo conectar con el servidor' };
+      }
+    }
+
+    function buildOrderPayload() {
+      return {
+        cart: state.cart.map(item => ({
+          name: item.name,
+          price: item.price + (item.additionalCost || 0),
+          quantity: item.quantity,
+          selectedOptions: item.selectedOptions || {},
+          extras: item.extras || []
+        })),
+        customer: {
+          name: state.customerName || 'Cliente',
+          email: state.customerEmail || 'cliente@correo.com',
+          phone: state.customerPhone,
+          address: state.customerAddress,
+          notes: state.customerNotes
+        },
+        paymentMethod: state.selectedPaymentMethod,
+        total: state.cart.reduce((sum, item) => sum + ((item.price + (item.additionalCost || 0)) * item.quantity), 0),
+        deliveryType: state.deliveryType
+      };
+    }
+
+    async function handleCheckoutResponse(result) {
+      if (!result.success) {
+        showToast(result.message || 'Error al procesar el pedido', 'error');
+        return;
+      }
+
+      if (result.paymentUrl) {
+        showToast('Redirigiendo al pago...', 'success');
+        window.location.href = result.paymentUrl;
+        return;
+      }
+
+      if (result.next === 'offline') {
+        showToast(result.message || 'Pedido registrado correctamente', 'success');
+        state.cart = [];
+        updateCartUI();
+        setTimeout(() => goHome(), 1500);
+      }
+    }
+
+    /**
+     * Selecciona método de pago y completa la compra
+     * @param {string} method - Método de pago
+     */
+    async function selectPayment(method) {
+
+  if (method === 'webpay') {
+
+    try {
+      const res = await fetch('/crear-pago', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cart: cart })
+      });
+
+      const data = await res.json();
+
+      console.log("Respuesta backend:", data);
+
+      // 🔥 Redirigir a Webpay
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = data.url;
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'token_ws';
+      input.value = data.token;
+
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
+
+    } catch (error) {
+      console.error(error);
+      alert("Error conectando con el servidor");
+    }
+  }
+}
+
+    /**
+     * Muestra un toast (notificación) en la pantalla
+     * @param {string} message - Mensaje a mostrar
+     * @param {string} type - Tipo: 'success', 'error'
+     */
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    /**
+     * Cierra todos los modales abiertos
+     */
+    function closeAllModals() {
+      document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.classList.remove('active');
+      });
+    }
+
+    // Inicializa los iconos de Lucide cuando la página carga
+    lucide.createIcons();
+    async function checkout() {
+
+  if (state.cart.length === 0) {
+    alert("El carrito está vacío");
+    return;
+  }
+
+  try {
+    const res = await fetch('http://localhost:5500/crear-pago', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cart: state.cart })
+    });
+
+    const data = await res.json();
+
+    // 🔥 REDIRECCIÓN A WEBPAY
+    window.location.href = data.url + '?token_ws=' + data.token;
+
+  } catch (error) {
+    console.error(error);
+    alert("Error al iniciar el pago");
+  }
+}
+  </script>
+  <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'9e9afd95d142492b',t:'MTc3NTc1MzIxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+  
+</body>
+
+</html>
